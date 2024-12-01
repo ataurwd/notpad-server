@@ -1,5 +1,3 @@
-//notepad-server
-//7Ohhhsd0kNN2s03m
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -24,6 +22,22 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
+
+    const notpadCollection = client.db('notpad').collection('single-notpad');
+
+    app.get('/add-node', async (req, res) => {
+        const cursor = notpadCollection.find();
+        const result = await cursor.toArray();
+        res.send(result)
+    })
+
+    app.post('/add-node', async (req, res) => {
+        const note = req.body;
+        const result = await notpadCollection.insertOne(note);
+        res.send(result)
+    })
+
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
